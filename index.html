@@ -244,10 +244,11 @@ html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text
 .sp{height:16px}
 .divider{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:16px 0}
 .acct-del{background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;padding:6px;border-radius:8px;transition:.2s;flex-shrink:0;line-height:1}
-.acct-del:active{color:var(--crimson);background:rgba(192,57,43,.12)}
-.ob-back{background:none;border:none;color:var(--dim);font-size:.82rem;cursor:pointer;margin-top:14px;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;padding:6px 0;transition:color .2s}
+.acct-del:hover{transform:scale(1.1)}
+.acct-del:active{color:var(--crimson);background:rgba(192,57,43,.12);transform:scale(0.95)}
+.ob-back{background:none;border:none;color:var(--dim);font-size:.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;padding:6px 0;transition:color .2s;margin:0}
 .ob-back:active{color:var(--gold)}
-.ob-back-wrap{display:none;width:100%;align-items:center;margin-bottom:16px}
+.ob-back-wrap{display:none;position:absolute;top:24px;left:20px;z-index:210}
 .ob-back-wrap.show{display:flex}
 </style>
 </head>
@@ -541,7 +542,6 @@ function defState() {
 let S = loadState();
 let calYear=2026, calMonth=4, curTab=0;
 
-// Added tracking variable for the previous account
 let previousAccountId = null; 
 
 function loadState(){try{const r=localStorage.getItem('stage_v3');if(r)return JSON.parse(r);}catch(e){}return defState();}
@@ -570,20 +570,21 @@ function renderAccounts(){
         +'<div class="acct-nm">'+esc(a.name)+(isCur?'<span class="acct-badge">Active</span>':'')+'</div>'
         +'<div class="acct-xp">'+rk.emoji+' '+rk.name+' · '+a.xp.toLocaleString()+' XP</div>'
       +'</div>'
+      +'<button class="acct-del" onclick="deleteAccount(event, \''+a.id+'\')" title="Delete Account">🗑️</button>'
     +'</div>';
   }).join('');
 }
 
 function switchAccount(id){
   if(id===getCurrentAccountId()){closeSheet('accounts');return;}
-  // Save current state under current id
+  
   const curId=getCurrentAccountId();
   if(curId){
     const accts=getAllAccounts();
     const idx=accts.findIndex(function(a){return a.id===curId;});
     if(idx>=0){accts[idx]={id:curId,name:S.user.name,avatar:S.user.avatar||'🎤',xp:S.user.xp,state:JSON.stringify(S)};saveAllAccounts(accts);}
   }
-  // Load selected account
+  
   const accts=getAllAccounts();
   const target=accts.find(function(a){return a.id===id;});
   if(target&&target.state){
@@ -597,10 +598,8 @@ function switchAccount(id){
 }
 
 function newAccount(){
-  // Save current account first
   saveCurrentAccountToList();
-  previousAccountId = getCurrentAccountId(); // Track previously active account
-  // Reset state and show onboarding
+  previousAccountId = getCurrentAccountId(); 
   S=defState();
   localStorage.removeItem('stage_v3');
   localStorage.removeItem('stage_current_acct');
@@ -612,7 +611,7 @@ function newAccount(){
   document.getElementById('ob-s3').classList.remove('active');
   document.getElementById('ob-name').value='';
   selectedAvatar='🎤';
-  document.getElementById('ob-back-wrap').classList.add('show'); // Show back button
+  document.getElementById('ob-back-wrap').classList.add('show'); 
 }
 
 function cancelNewAccount() {
@@ -626,6 +625,38 @@ function cancelNewAccount() {
   document.getElementById('ob').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   openSheet('accounts');
+}
+
+function deleteAccount(e, id){
+  e.stopPropagation();
+  if(!confirm('Are you sure you want to delete this account? This cannot be undone.')) return;
+  
+  let accts = getAllAccounts();
+  accts = accts.filter(function(a){ return a.id !== id; });
+  saveAllAccounts(accts);
+  
+  if(id === getCurrentAccountId()){
+    if(accts.length > 0){
+      setCurrentAccountId(null); 
+      switchAccount(accts[0].id);
+      setTimeout(function(){ openSheet('accounts'); }, 50);
+    } else {
+      setCurrentAccountId(null);
+      S = defState();
+      localStorage.removeItem('stage_v3');
+      closeSheet('accounts');
+      document.getElementById('app').style.display = 'none';
+      document.getElementById('ob').style.display = 'flex';
+      document.getElementById('ob-s1').classList.add('active');
+      document.getElementById('ob-s2').classList.remove('active');
+      document.getElementById('ob-s3').classList.remove('active');
+      document.getElementById('ob-name').value = '';
+      selectedAvatar = '🎤';
+      document.getElementById('ob-back-wrap').classList.remove('show');
+    }
+  } else {
+    renderAccounts();
+  }
 }
 
 function logoutAccount(){
@@ -710,13 +741,12 @@ async function enableNotifs(){
 }
 function obFinish(){
   S.onboarded=true;S.lastDate=todayStr();S.lastGoalDate=todayStr();save();
-  // Register in accounts list
   const id='acct_'+Date.now();
   const accts=getAllAccounts();
   accts.push({id:id,name:S.user.name,avatar:S.user.avatar||'🎤',xp:0,state:JSON.stringify(S)});
   saveAllAccounts(accts);
   setCurrentAccountId(id);
-  document.getElementById('ob-back-wrap').classList.remove('show'); // Hide back button for normal use
+  document.getElementById('ob-back-wrap').classList.remove('show'); 
   document.getElementById('ob').style.display='none';
   document.getElementById('app').style.display='flex';
   initApp();
