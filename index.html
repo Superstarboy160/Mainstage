@@ -306,6 +306,7 @@ html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text
 
   <div class="pages" id="pages">
     <div class="pages-wrap" id="pw">
+      
       <div class="page" id="pg-home">
         <div class="coach-box">
           <div class="coach-av">🎭</div>
@@ -331,13 +332,12 @@ html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text
           <div class="stat-pill"><span class="sp-ico">✅</span><span class="sp-val" id="stat-tasks">0</span><span class="sp-lbl">Done</span></div>
           <div class="stat-pill"><span class="sp-ico">🎬</span><span class="sp-val" id="stat-aud">0</span><span class="sp-lbl">Auditions</span></div>
         </div>
-        <div class="sec-hdr">
-          <span class="sec-title">Today's Practice</span>
-          <button class="add-btn" onclick="openSheet('add-task')">+ Add Task</button>
+        
+        <div class="sec-hdr" style="margin-bottom:16px">
+          <span class="sec-title" style="font-size:1.3rem">Daily Goals</span>
+          <span style="font-size:.7rem;color:var(--dim)">+50 XP each</span>
         </div>
-        <div class="task-list" id="task-list">
-          <div class="empty"><span class="empty-ico">📋</span><span class="empty-txt">No tasks yet.<br>Add your first practice session!</span></div>
-        </div>
+        <div id="goals-list"></div>
         <div class="sp"></div>
       </div>
 
@@ -358,12 +358,14 @@ html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text
         <div class="sp"></div>
       </div>
 
-      <div class="page" id="pg-goals">
-        <div class="sec-hdr" style="margin-bottom:16px">
-          <span class="sec-title" style="font-size:1.3rem">Daily Goals</span>
-          <span style="font-size:.7rem;color:var(--dim)">+50 XP each</span>
+      <div class="page" id="pg-tasks">
+        <div class="sec-hdr">
+          <span class="sec-title">Your Tasks</span>
+          <button class="add-btn" onclick="openSheet('add-task')">+ Add Task</button>
         </div>
-        <div id="goals-list"></div>
+        <div class="task-list" id="task-list">
+          <div class="empty"><span class="empty-ico">📋</span><span class="empty-txt">No tasks yet.<br>Add your first practice session!</span></div>
+        </div>
         <div class="sp"></div>
       </div>
 
@@ -383,7 +385,7 @@ html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text
   <nav class="tabbar">
     <button class="tab active" id="tab-0" onclick="goTab(0)"><span class="tab-ico">🏠</span><span class="tab-lbl">Home</span></button>
     <button class="tab" id="tab-1" onclick="goTab(1)"><span class="tab-ico">📅</span><span class="tab-lbl">Calendar</span></button>
-    <button class="tab" id="tab-2" onclick="goTab(2)"><span class="tab-ico">🎯</span><span class="tab-lbl">Goals</span></button>
+    <button class="tab" id="tab-2" onclick="goTab(2)"><span class="tab-ico">📋</span><span class="tab-lbl">Tasks</span></button>
     <button class="tab" id="tab-3" onclick="goTab(3)"><span class="tab-ico">🏅</span><span class="tab-lbl">Ranks</span></button>
   </nav>
 </div>
@@ -748,9 +750,8 @@ function updateAiXP(){
   
   let changed = false;
   
-  // Natural background gain based on actual hours passed
   if (hoursPassed >= 1) {
-    const cappedHours = Math.min(Math.floor(hoursPassed), 24 * 30); // max 1 month off
+    const cappedHours = Math.min(Math.floor(hoursPassed), 24 * 30);
     AI_BOARD.forEach(function(p){
       const hourlyMax = p.gain[1] / 24;
       for(let i=0; i<cappedHours; i++){
@@ -761,7 +762,6 @@ function updateAiXP(){
     changed = true;
   }
   
-  // Occasional instant boost on app load to mimic real-time players currently online
   if (Math.random() < 0.35) {
      AI_BOARD.forEach(function(p){
        if (Math.random() < 0.2) { 
@@ -865,7 +865,9 @@ function goTab(i){
   curTab=i;
   document.getElementById('pw').style.transform=`translateX(-${i*25}%)`;
   document.querySelectorAll('.tab').forEach(function(t,j){t.classList.toggle('active',j===i);});
-  if(i===2)renderGoals();if(i===3)renderLeaderboard();
+  if(i===0)renderGoals();
+  if(i===2)renderTaskList();
+  if(i===3)renderLeaderboard();
 }
 function setupSwipe(){
   const pages=document.getElementById('pages');let sx=0,sy=0,moved=false;
@@ -1079,6 +1081,7 @@ function closeRelegate(){document.getElementById('rel-scene').classList.remove('
 
 /* ══ MODALS ══ */
 function openSheet(name){
+  if(name==='accounts'){ saveCurrentAccountToList(); } // ENSURES LIVE RANK UPDATES
   document.getElementById('sheet-'+name).classList.add('open');
   if(name==='add-event'){const d=new Date();document.getElementById('e-date').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   if(name==='accounts')renderAccounts();
