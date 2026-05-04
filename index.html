@@ -35,7 +35,7 @@ html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text
 .hdr{height:var(--hdr-h);display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
 .hdr-logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,var(--gold-lt),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:5px}
 .hdr-right{display:flex;align-items:center;gap:8px}
-.hdr-ring-wrap{display:flex;align-items:center;gap:7px;background:var(--surface2);padding:4px 12px 4px 5px;border-radius:22px;border:1px solid var(--border2)}
+.hdr-ring-wrap{display:flex;align-items:center;gap:7px;background:var(--surface2);padding:4px 12px 4px 12px;border-radius:22px;border:1px solid var(--border2)}
 .hdr-acct-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--dim);width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:.2s;flex-shrink:0}
 .hdr-acct-btn:active{background:var(--gold);color:var(--bg);border-color:var(--gold)}
 .ring-cont{position:relative;width:36px;height:36px;flex-shrink:0}
@@ -289,6 +289,7 @@ html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text
     <div class="hdr-right">
       <button class="hdr-acct-btn" onclick="openSheet('accounts')" title="Accounts">👤</button>
       <div class="hdr-ring-wrap">
+        <span id="hdr-uname" style="font-size:.7rem; font-weight:700; color:var(--text); margin-right:4px;"></span>
         <div class="ring-cont" id="hdr-ring-cont">
           <svg class="ring-svg" viewBox="0 0 36 36">
             <circle class="ring-bg" cx="18" cy="18" r="15" fill="none" stroke-width="2.5"/>
@@ -474,52 +475,96 @@ const RANKS = [
 ];
 const CAT_ICONS = {acting:'🎭',singing:'🎤',dancing:'💃',piano:'🎹',fitness:'💪',study:'📖',other:'✨'};
 const CAT_GOAL  = {acting:'Acting Practice',singing:'Singing',dancing:'Dance',piano:'Piano',fitness:'Fitness'};
+
+// Rivals dynamically assigned per rank
+const RIVAL_MAP = {
+  'wannabe': 'ChloeTries',     // Base ~250
+  'rookie': 'RivaStage',       // Base ~1000
+  'rising': 'JaxTheatre',      // Base ~2800
+  'semipro': 'SkyActing',      // Base ~6000
+  'pro': 'VeronicaActs',       // Base ~12000
+  'elite': 'GoldMicDario',     // Base ~20000
+  'allstar': 'LegacyActs',     // Base ~38000
+  'legend': 'TheBardReborn'    // Base ~60000
+};
+
 const AI_BOARD = [
-  {name:'DaisyFirst',   av:'🌷', xp:28,   gain:[7,  22],  isRival:false},
-  {name:'ActorKid99',   av:'🎪', xp:55,   gain:[9,  26],  isRival:false},
-  {name:'StageFright',  av:'😬', xp:82,   gain:[10, 29],  isRival:false},
-  {name:'BellaVoice',   av:'🌸', xp:105,  gain:[11, 31],  isRival:false},
-  {name:'JustStarted',  av:'🐣', xp:128,  gain:[11, 32],  isRival:false},
-  {name:'TheatreKid',   av:'🎨', xp:150,  gain:[12, 34],  isRival:false},
-  {name:'TryingActor',  av:'🧢', xp:172,  gain:[13, 36],  isRival:false},
-  {name:'MiloScene',    av:'🎵', xp:195,  gain:[13, 37],  isRival:false},
-  {name:'ZaraDebuts',   av:'🦋', xp:218,  gain:[14, 38],  isRival:false},
-  {name:'OliviaDrama',  av:'🌺', xp:238,  gain:[14, 39],  isRival:false},
-  {name:'FoxOnStage',   av:'🦊', xp:255,  gain:[15, 40],  isRival:false},
-  {name:'LeoFirstAct',  av:'🦁', xp:272,  gain:[15, 41],  isRival:false},
-  {name:'HarrietSings', av:'🎀', xp:290,  gain:[16, 42],  isRival:false},
-  {name:'CharlieActs',  av:'🌙', xp:308,  gain:[16, 43],  isRival:false},
-  {name:'RivaStage',    av:'💫', xp:320,  gain:[20, 52],  isRival:true },
-  {name:'NovaCast',     av:'⚡', xp:338,  gain:[17, 44],  isRival:false},
-  {name:'FinnDrama',    av:'🎯', xp:355,  gain:[17, 45],  isRival:false},
-  {name:'RubySpotlight',av:'💄', xp:372,  gain:[18, 46],  isRival:false},
-  {name:'PippaStage',   av:'🌊', xp:390,  gain:[18, 47],  isRival:false},
-  {name:'MaxCallbacks', av:'🏹', xp:410,  gain:[19, 48],  isRival:false},
-  {name:'IslaPerforms', av:'🌠', xp:428,  gain:[19, 49],  isRival:false},
-  {name:'TomTreads',    av:'🎩', xp:448,  gain:[19, 50],  isRival:false},
-  {name:'GraceWings',   av:'🕊', xp:468,  gain:[20, 51],  isRival:false},
-  {name:'AlexFirstCall',av:'🎬', xp:482,  gain:[20, 51],  isRival:false},
-  {name:'NewToThis',    av:'🌱', xp:540,  gain:[28, 68],  isRival:false},
-  {name:'CoopDrama',    av:'🎤', xp:680,  gain:[32, 80],  isRival:false},
-  {name:'RedCurtain',   av:'🔴', xp:820,  gain:[35, 88],  isRival:false},
-  {name:'AshPerforms',  av:'🌊', xp:960,  gain:[38, 95],  isRival:false},
-  {name:'LexiStage',    av:'🎀', xp:1100, gain:[42, 100], isRival:false},
-  {name:'OscarWilde2',  av:'🎩', xp:1280, gain:[45, 105], isRival:false},
-  {name:'RoxyRehearse', av:'💄', xp:1400, gain:[48, 110], isRival:false},
-  {name:'LenaPerform',  av:'✨', xp:1700, gain:[65, 150],  isRival:false},
-  {name:'BlakeCast',    av:'🌠', xp:2100, gain:[72, 165],  isRival:false},
-  {name:'VioletScene',  av:'💜', xp:2600, gain:[80, 180],  isRival:false},
-  {name:'KaiTheatre',   av:'🦅', xp:3100, gain:[88, 195],  isRival:false},
-  {name:'SiennaDrama',  av:'🍂', xp:3700, gain:[92, 205],  isRival:false},
-  {name:'SkyActing',    av:'🎬', xp:4400, gain:[115, 240], isRival:false},
-  {name:'BlueMask',     av:'🎭', xp:5800, gain:[130, 270], isRival:false},
-  {name:'DexterCalls',  av:'📞', xp:7200, gain:[145, 300], isRival:false},
-  {name:'JaxTheatre',   av:'🎭', xp:9200, gain:[160, 330], isRival:false},
-  {name:'VeronicaActs', av:'💃', xp:12400,gain:[175, 355], isRival:false},
-  {name:'MarcellaV',    av:'🌟', xp:18000,gain:[200, 400], isRival:false},
-  {name:'GoldMicDario', av:'🎙', xp:22000,gain:[210, 420], isRival:false},
-  {name:'LegacyActs',   av:'👑', xp:31000,gain:[240, 480], isRival:false},
-  {name:'TheBardReborn',av:'🌍', xp:44000,gain:[260, 500], isRival:false},
+  // Wannabe (0-500)
+  {name:'DaisyFirst', av:'🌷', xp:28, gain:[7,22]},
+  {name:'ActorKid99', av:'🎪', xp:55, gain:[9,26]},
+  {name:'StageFright', av:'😬', xp:82, gain:[10,29]},
+  {name:'BellaVoice', av:'🌸', xp:105, gain:[11,31]},
+  {name:'JustStarted', av:'🐣', xp:128, gain:[11,32]},
+  {name:'TheatreKid', av:'🎨', xp:150, gain:[12,34]},
+  {name:'TryingActor', av:'🧢', xp:172, gain:[13,36]},
+  {name:'MiloScene', av:'🎵', xp:195, gain:[13,37]},
+  {name:'ZaraDebuts', av:'🦋', xp:218, gain:[14,38]},
+  {name:'OliviaDrama', av:'🌺', xp:238, gain:[14,39]},
+  {name:'ChloeTries', av:'🦄', xp:250, gain:[15,40]}, 
+  {name:'FoxOnStage', av:'🦊', xp:255, gain:[15,40]},
+  {name:'LeoFirstAct', av:'🦁', xp:272, gain:[15,41]},
+  {name:'HarrietSings', av:'🎀', xp:290, gain:[16,42]},
+  {name:'CharlieActs', av:'🌙', xp:308, gain:[16,43]},
+  {name:'NovaCast', av:'⚡', xp:338, gain:[17,44]},
+  {name:'FinnDrama', av:'🎯', xp:355, gain:[17,45]},
+  {name:'RubySpotlight', av:'💄', xp:372, gain:[18,46]},
+  {name:'PippaStage', av:'🌊', xp:390, gain:[18,47]},
+  {name:'MaxCallbacks', av:'🏹', xp:410, gain:[19,48]},
+  {name:'IslaPerforms', av:'🌠', xp:428, gain:[19,49]},
+  {name:'TomTreads', av:'🎩', xp:448, gain:[19,50]},
+  {name:'GraceWings', av:'🕊', xp:468, gain:[20,51]},
+  {name:'AlexFirstCall', av:'🎬', xp:482, gain:[20,51]},
+  // Rookie (500-1500)
+  {name:'NewToThis', av:'🌱', xp:540, gain:[28,68]},
+  {name:'CoopDrama', av:'🎤', xp:680, gain:[32,80]},
+  {name:'RedCurtain', av:'🔴', xp:820, gain:[35,88]},
+  {name:'AshPerforms', av:'🌊', xp:960, gain:[38,95]},
+  {name:'RivaStage', av:'💫', xp:1000, gain:[40,100]}, 
+  {name:'LexiStage', av:'🎀', xp:1100, gain:[42,100]},
+  {name:'MyaScenes', av:'📖', xp:1150, gain:[43,102]},
+  {name:'OscarWilde2', av:'🎩', xp:1280, gain:[45,105]},
+  {name:'RoxyRehearse', av:'💄', xp:1400, gain:[48,110]},
+  {name:'DannyScripts', av:'📄', xp:1450, gain:[48,112]},
+  // Rising Star (1500-4000)
+  {name:'LenaPerform', av:'✨', xp:1700, gain:[65,150]},
+  {name:'JakeAudition', av:'🎭', xp:1900, gain:[68,160]},
+  {name:'BlakeCast', av:'🌠', xp:2100, gain:[72,165]},
+  {name:'CelineSings', av:'🎵', xp:2350, gain:[75,170]},
+  {name:'VioletScene', av:'💜', xp:2600, gain:[80,180]},
+  {name:'JaxTheatre', av:'🎭', xp:2800, gain:[85,190]}, 
+  {name:'KaiTheatre', av:'🦅', xp:3100, gain:[88,195]},
+  {name:'StellaStars', av:'⭐', xp:3400, gain:[90,200]},
+  {name:'SiennaDrama', av:'🍂', xp:3700, gain:[92,205]},
+  {name:'EvanAuditions', av:'🎬', xp:3900, gain:[95,210]},
+  // Semi-Pro (4000-8000)
+  {name:'SkyActing', av:'🎬', xp:4400, gain:[115,240]}, 
+  {name:'LiamLeads', av:'👦', xp:5100, gain:[120,250]},
+  {name:'BlueMask', av:'🎭', xp:5800, gain:[130,270]},
+  {name:'ChloeStage', av:'🌸', xp:6400, gain:[135,280]},
+  {name:'DexterCalls', av:'📞', xp:7200, gain:[145,300]},
+  {name:'CarmenSings', av:'🎵', xp:7800, gain:[150,310]},
+  // Pro (8000-15000)
+  {name:'TobyLines', av:'📝', xp:8500, gain:[155,320]},
+  {name:'RachelActs', av:'🎭', xp:9500, gain:[160,330]},
+  {name:'NoahPro', av:'🔥', xp:10800, gain:[170,345]},
+  {name:'VeronicaActs', av:'💃', xp:12000, gain:[175,355]}, 
+  {name:'NinaStage', av:'🖤', xp:13500, gain:[180,360]},
+  {name:'DerekFilms', av:'🎥', xp:14500, gain:[185,370]},
+  // Elite (15000-25000)
+  {name:'GabePro', av:'🔥', xp:16000, gain:[190,380]},
+  {name:'MarcellaV', av:'🌟', xp:18000, gain:[200,400]},
+  {name:'GoldMicDario', av:'🎙', xp:20000, gain:[210,420]}, 
+  {name:'ElenaDrama', av:'💃', xp:22000, gain:[215,430]},
+  {name:'ElizaLead', av:'👑', xp:24000, gain:[220,440]},
+  // All-Star (25000-50000)
+  {name:'VictorStar', av:'⭐', xp:28000, gain:[230,460]},
+  {name:'MiaMajestic', av:'💫', xp:32000, gain:[235,470]},
+  {name:'LegacyActs', av:'👑', xp:38000, gain:[240,480]}, 
+  {name:'SophiaShine', av:'✨', xp:45000, gain:[250,490]},
+  // Legend (50000+)
+  {name:'TheBardReborn', av:'🌍', xp:60000, gain:[260,500]}, 
+  {name:'DramaKing', av:'🎭', xp:75000, gain:[270,520]},
+  {name:'StageGod', av:'⚡', xp:95000, gain:[280,550]}
 ];
 const DEFAULT_GOALS = [
   {id:'g1',title:'Acting Practice',icon:'🎭',target:60,current:0,streak:0,cat:'acting'},
@@ -536,7 +581,7 @@ function defState() {
     rankKey:'wannabe', tasks:[], events:[],
     goals:JSON.parse(JSON.stringify(DEFAULT_GOALS)),
     lastDate:null, notifEnabled:false, lastGoalDate:null,
-    aiXP:null, aiXPDate:null
+    aiXP:null, aiXPTimestamp:null
   };
 }
 let S = loadState();
@@ -688,24 +733,56 @@ function saveCurrentAccountToList(){
 
 /* ══ AI XP ══ */
 function initAiXP(){
-  if(!S.aiXP){S.aiXP={};AI_BOARD.forEach(function(p){S.aiXP[p.name]=p.xp;});S.aiXPDate=todayStr();save();}
+  if(!S.aiXP){
+    S.aiXP={};
+    AI_BOARD.forEach(function(p){S.aiXP[p.name]=p.xp;});
+    S.aiXPTimestamp=Date.now();
+    save();
+  }
 }
 function updateAiXP(){
   initAiXP();
-  const today=todayStr();
-  if(S.aiXPDate===today)return;
-  const last=new Date(S.aiXPDate+'T00:00:00');
-  const now=new Date(today+'T00:00:00');
-  const days=Math.max(1,Math.min(Math.round((now-last)/86400000),60));
-  AI_BOARD.forEach(function(p){
-    const mn=p.gain[0],mx=p.gain[1];
-    for(let d=0;d<days;d++)S.aiXP[p.name]=(S.aiXP[p.name]||p.xp)+Math.floor(mn+Math.random()*(mx-mn));
-  });
-  S.aiXPDate=today;save();
+  const now = Date.now();
+  const last = S.aiXPTimestamp || now;
+  const hoursPassed = (now - last) / 3600000;
+  
+  let changed = false;
+  
+  // Natural background gain based on actual hours passed
+  if (hoursPassed >= 1) {
+    const cappedHours = Math.min(Math.floor(hoursPassed), 24 * 30); // max 1 month off
+    AI_BOARD.forEach(function(p){
+      const hourlyMax = p.gain[1] / 24;
+      for(let i=0; i<cappedHours; i++){
+        S.aiXP[p.name] = (S.aiXP[p.name]||p.xp) + Math.floor(Math.random() * hourlyMax);
+      }
+    });
+    S.aiXPTimestamp = now;
+    changed = true;
+  }
+  
+  // Occasional instant boost on app load to mimic real-time players currently online
+  if (Math.random() < 0.35) {
+     AI_BOARD.forEach(function(p){
+       if (Math.random() < 0.2) { 
+         S.aiXP[p.name] = (S.aiXP[p.name]||p.xp) + Math.floor(10 + Math.random() * 40);
+       }
+     });
+     changed = true;
+  }
+  
+  if(changed) save();
 }
+
 function getAiPlayers(){
   initAiXP();
-  return AI_BOARD.map(function(p){return Object.assign({},p,{xp:S.aiXP[p.name]||p.xp});});
+  const activeRivalName = RIVAL_MAP[S.rankKey] || 'RivaStage';
+  return AI_BOARD.map(function(p){
+    return Object.assign({}, p, {
+      xp: S.aiXP[p.name] || p.xp,
+      isRival: p.name === activeRivalName
+    });
+  });
 }
 
 /* ══ ONBOARDING ══ */
@@ -806,8 +883,11 @@ function renderAll(){renderHeader();renderRankCard();renderStats();renderTaskLis
 /* ══ HEADER ══ */
 function renderHeader(){
   const r=currentRank();const ri=getRankIndex(S.user.xp);const next=RANKS[ri+1];
+  
+  document.getElementById('hdr-uname').textContent=S.user.name ? esc(S.user.name) : 'User';
   document.getElementById('hdr-emoji').textContent=r.emoji;
   document.getElementById('hdr-rname').textContent=r.name;
+  
   const ring=document.getElementById('hdr-ring-prog');
   if(ring){
     const circ=94.25;let pct=next?(S.user.xp-r.minXP)/(next.minXP-r.minXP):1;
@@ -866,8 +946,16 @@ function toggleTask(id){
   showToast('+'+t.xp+' XP earned!');save();scheduleNotifs();renderAll();
 }
 function addTask(){
-  const nm=document.getElementById('t-name').value.trim();if(!nm){document.getElementById('t-name').focus();return;}
   const today=todayStr();
+  const todayTasks=S.tasks.filter(function(t){return t.date===today;});
+  
+  if(todayTasks.length >= 3){
+    showToast('Daily limit of 3 tasks reached! Rest up.');
+    closeSheet('add-task');
+    return;
+  }
+  
+  const nm=document.getElementById('t-name').value.trim();if(!nm){document.getElementById('t-name').focus();return;}
   S.tasks.push({id:'t'+Date.now(),name:nm,cat:document.getElementById('t-cat').value,time:document.getElementById('t-time').value,dur:parseInt(document.getElementById('t-dur').value)||60,xp:parseInt(document.getElementById('t-xp').value)||40,done:false,date:today});
   save();closeSheet('add-task');document.getElementById('t-name').value='';renderTaskList();renderStats();scheduleNotifs();
 }
