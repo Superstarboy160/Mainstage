@@ -1,0 +1,1013 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#030205">
+<title>STAGE</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #030205;
+  --surface:  #0b0910;
+  --surface2: #130f1e;
+  --surface3: #1c1730;
+  --border:   #221c38;
+  --border2:  #2e2648;
+  --gold:     #d4a843;
+  --gold-lt:  #f0cc70;
+  --gold-dk:  #8a6520;
+  --gold-glow:rgba(212,168,67,.18);
+  --crimson:  #c0392b;
+  --text:     #f0ece8;
+  --dim:      #6e6888;
+  --muted:    #332d4a;
+  --green:    #27ae60;
+  --tab-h:    68px;
+  --hdr-h:    60px;
+  --r:        16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100%;overflow:hidden;max-width:430px;margin:0 auto}
+#app{height:100dvh;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.hdr{height:var(--hdr-h);display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
+.hdr-logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,var(--gold-lt),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:5px}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-ring-wrap{display:flex;align-items:center;gap:7px;background:var(--surface2);padding:4px 12px 4px 5px;border-radius:22px;border:1px solid var(--border2)}
+.hdr-acct-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--dim);width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:.2s;flex-shrink:0}
+.hdr-acct-btn:active{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+.ring-cont{position:relative;width:36px;height:36px;flex-shrink:0}
+.ring-svg{width:100%;height:100%;position:absolute;top:0;left:0;overflow:visible}
+.ring-bg{stroke:var(--muted)}
+.ring-prog{stroke:var(--gold);transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1);filter:drop-shadow(0 0 4px rgba(212,168,67,.6))}
+.ring-emoji{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.05rem;line-height:1}
+.hdr-rank-nm{font-size:.68rem;font-weight:600;color:var(--gold);letter-spacing:.5px;text-transform:uppercase}
+.acct-item{display:flex;align-items:center;gap:13px;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;padding:13px 15px;margin-bottom:9px;cursor:pointer;transition:.2s}
+.acct-item:active{border-color:var(--gold);background:rgba(212,168,67,.08)}
+.acct-item.current{border-color:var(--gold-dk);background:rgba(212,168,67,.06)}
+.acct-av{font-size:1.5rem;width:40px;height:40px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.acct-inf{flex:1}
+.acct-nm{font-size:.9rem;font-weight:600;color:var(--text)}
+.acct-xp{font-size:.72rem;color:var(--dim);margin-top:2px}
+.acct-badge{font-size:.65rem;font-weight:700;background:var(--gold-dk);color:var(--bg);padding:2px 8px;border-radius:8px;margin-left:6px}
+.acct-new{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border:1.5px dashed var(--border2);border-radius:14px;cursor:pointer;color:var(--dim);font-size:.85rem;font-weight:500;transition:.2s;margin-top:4px}
+.acct-new:active{border-color:var(--gold);color:var(--gold)}
+.acct-logout{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border:1.5px solid rgba(192,57,43,.3);border-radius:14px;cursor:pointer;color:var(--crimson);font-size:.85rem;font-weight:500;transition:.2s;margin-top:8px;background:rgba(192,57,43,.05)}
+.acct-logout:active{background:rgba(192,57,43,.15);border-color:var(--crimson)}
+.pages{flex:1;overflow:hidden;position:relative}
+.pages-wrap{display:flex;height:100%;width:400%;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform}
+.page{width:25%;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:18px 18px 24px}
+.page::-webkit-scrollbar{display:none}
+.page{scrollbar-width:none}
+.tabbar{height:var(--tab-h);background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0px)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;padding:6px;transition:.2s;color:var(--muted);position:relative}
+.tab.active{color:var(--gold)}
+.tab-ico{font-size:1.3rem;transition:transform .2s}
+.tab.active .tab-ico{transform:scale(1.15)}
+.tab-lbl{font-size:.6rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+@keyframes shimmer{0%{background-position:200% center}100%{background-position:-200% center}}
+.gold-shine{background:linear-gradient(90deg,var(--gold-dk) 0%,var(--gold-lt) 30%,var(--gold) 50%,var(--gold-lt) 70%,var(--gold-dk) 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 4s linear infinite}
+.rank-card{background:linear-gradient(145deg,#120920 0%,#0a0710 60%,#14091c 100%);border:1px solid var(--gold-dk);border-radius:var(--r);padding:20px;margin-bottom:16px;position:relative;overflow:hidden}
+.rank-card::before{content:'';position:absolute;top:-60px;right:-60px;width:160px;height:160px;background:radial-gradient(circle,rgba(212,168,67,.14),transparent 65%);pointer-events:none}
+.rank-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dk),transparent)}
+.rank-emblem{text-align:center;margin-bottom:14px}
+.rank-emoji-lg{font-size:3.5rem;display:block;margin-bottom:4px;filter:drop-shadow(0 0 20px rgba(212,168,67,.65))}
+.rank-name-lg{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.xp-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.xp-val{font-size:2rem;font-weight:700;color:var(--text)}
+.xp-next-lbl{font-size:.75rem;color:var(--dim)}
+.prog-bar{height:4px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold-dk),var(--gold),var(--gold-lt));border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1);position:relative}
+.prog-fill::after{content:'';position:absolute;right:0;top:-2px;bottom:-2px;width:6px;background:var(--gold-lt);border-radius:50%;box-shadow:0 0 8px var(--gold)}
+.prog-meta{display:flex;justify-content:space-between;font-size:.7rem;color:var(--dim)}
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat-pill{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px 8px;text-align:center;position:relative;overflow:hidden}
+.stat-pill::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(212,168,67,.04),transparent);pointer-events:none}
+.sp-ico{font-size:1.3rem;display:block;margin-bottom:3px}
+.sp-val{font-size:1.1rem;font-weight:700;color:var(--gold);display:block}
+.sp-lbl{font-size:.6rem;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+.sec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--text)}
+.add-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--gold);padding:6px 14px;border-radius:20px;font-size:.72rem;font-weight:600;cursor:pointer;letter-spacing:.3px;transition:.2s;font-family:'DM Sans',sans-serif}
+.add-btn:active{background:var(--gold);color:var(--bg)}
+.task-list{display:flex;flex-direction:column;gap:9px}
+.task-item{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:all .2s;user-select:none}
+.task-item:active{transform:scale(.985);border-color:var(--gold)}
+.task-item.done{opacity:.4}
+.task-chk{width:24px;height:24px;border:2px solid var(--border2);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;transition:.2s}
+.task-item.done .task-chk{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+.task-cat-ico{font-size:1.2rem;flex-shrink:0}
+.task-inf{flex:1;min-width:0}
+.task-nm{font-size:.88rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task-item.done .task-nm{text-decoration:line-through;color:var(--dim)}
+.task-meta{font-size:.72rem;color:var(--dim);margin-top:1px}
+.task-xp{background:var(--surface3);color:var(--gold);padding:4px 9px;border-radius:9px;font-size:.72rem;font-weight:600;flex-shrink:0;border:1px solid var(--gold-dk)}
+.coach-box{background:linear-gradient(135deg,var(--surface2),var(--surface));border:1px solid var(--border2);border-left:2px solid var(--gold-dk);border-radius:var(--r);padding:14px;display:flex;gap:11px;align-items:flex-start;margin-bottom:16px}
+.coach-av{font-size:1.8rem;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(212,168,67,.4))}
+.coach-nm{font-size:.65rem;font-weight:600;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.coach-txt{font-size:.82rem;color:var(--dim);line-height:1.55}
+.empty{text-align:center;padding:32px 20px;color:var(--muted)}
+.empty-ico{font-size:2.5rem;display:block;margin-bottom:10px}
+.empty-txt{font-size:.82rem;line-height:1.5}
+.cal-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.cal-btn{background:var(--surface);border:1px solid var(--border);color:var(--dim);width:34px;height:34px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:.2s;font-family:'DM Sans',sans-serif}
+.cal-btn:active{background:var(--gold);color:var(--bg)}
+.cal-month{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--text)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:18px}
+.cal-dh{text-align:center;font-size:.6rem;font-weight:600;color:var(--muted);padding:5px 0;letter-spacing:.5px;text-transform:uppercase}
+.cal-d{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:9px;font-size:.82rem;cursor:pointer;position:relative;transition:all .15s;color:var(--text)}
+.cal-d.other{color:var(--muted);opacity:.3}
+.cal-d.today{background:var(--surface3);border:1.5px solid var(--gold);font-weight:700;color:var(--gold);box-shadow:0 0 10px rgba(212,168,67,.2)}
+.cal-d.has-ev::after{content:'';position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--gold-dk)}
+.cal-d.has-aud::after{background:var(--crimson)}
+.cal-d:active{background:var(--surface2)}
+.ev-item{background:var(--surface);border:1px solid var(--border2);border-left:3px solid var(--gold);border-radius:12px;padding:13px 15px;margin-bottom:9px;display:flex;align-items:center;gap:11px}
+.ev-item.audition{border-left-color:var(--crimson)}
+.ev-item.callback{border-left-color:#60a5fa}
+.ev-item.workshop{border-left-color:#2ecc71}
+.ev-item.performance{border-left-color:#a78bfa}
+.ev-ico{font-size:1.3rem;flex-shrink:0}
+.ev-inf{flex:1}
+.ev-nm{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:2px}
+.ev-meta{font-size:.72rem;color:var(--dim)}
+.goal-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:17px;margin-bottom:11px;transition:border-color .3s}
+.goal-card.completed{border-color:var(--gold-dk);background:linear-gradient(135deg,#150f1e,var(--surface))}
+.goal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
+.goal-left{display:flex;align-items:center;gap:10px}
+.goal-ico{font-size:1.4rem}
+.goal-title{font-size:.88rem;font-weight:600;color:var(--text)}
+.goal-streak{background:rgba(255,100,50,.14);color:#ff6432;padding:4px 9px;border-radius:9px;font-size:.7rem;font-weight:600}
+.goal-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:9px}
+.goal-fill{height:100%;background:linear-gradient(90deg,var(--gold-dk),var(--gold));border-radius:3px;transition:width .5s ease}
+.goal-bottom{display:flex;justify-content:space-between;align-items:center}
+.goal-meta{font-size:.7rem;color:var(--dim);display:flex;gap:10px}
+.goal-done-btn{padding:6px 16px;border-radius:10px;font-size:.72rem;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.2s;letter-spacing:.3px}
+.goal-done-btn.active{background:linear-gradient(135deg,var(--gold),var(--gold-dk));color:var(--bg)}
+.goal-done-btn.active:active{transform:scale(.94)}
+.goal-done-btn.inactive{background:var(--surface3);color:var(--gold);border:1px solid var(--gold-dk);cursor:default}
+.lb-hdr{text-align:center;margin-bottom:16px;padding-top:6px}
+.lb-ttl{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:700;color:var(--gold);margin-bottom:3px}
+.lb-sub{font-size:.75rem;color:var(--dim)}
+.rival-card{background:linear-gradient(135deg,#180a0a 0%,#0c080f 50%,#0b1208 100%);border:1px solid var(--gold-dk);border-radius:var(--r);padding:16px 14px;margin-bottom:18px;position:relative;overflow:hidden}
+.rival-card::before{content:'⚔';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3.5rem;opacity:.06;pointer-events:none}
+.rival-card-title{font-size:.65rem;font-weight:600;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;text-align:center;margin-bottom:14px}
+.rival-vs-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin-bottom:12px}
+.rival-side{display:flex;flex-direction:column;align-items:center;gap:4px}
+.rival-av{font-size:2rem;filter:drop-shadow(0 0 8px rgba(212,168,67,.4))}
+.rival-name{font-size:.68rem;font-weight:600;color:var(--dim)}
+.rival-xp{font-size:1.05rem;font-weight:700;color:var(--gold)}
+.rival-vs-sep{font-size:1.4rem;color:var(--crimson);font-weight:700;text-align:center}
+.rival-gap-row{background:var(--surface2);border-radius:10px;padding:8px 12px;text-align:center}
+.rival-gap-txt{font-size:.78rem;color:var(--dim)}
+.rival-gap-txt strong{color:var(--gold)}
+.rival-gap-txt.ahead{color:var(--green)}
+.rival-gap-txt.ahead strong{color:var(--green)}
+.lb-rank-filter{display:flex;justify-content:center;margin-bottom:14px}
+.rank-filter-badge{background:var(--surface3);border:1px solid var(--gold-dk);color:var(--gold);padding:5px 14px;border-radius:20px;font-size:.7rem;font-weight:600;letter-spacing:.5px}
+.lb-item{background:var(--surface);border:1px solid var(--border2);border-radius:13px;padding:13px 15px;margin-bottom:9px;display:flex;align-items:center;gap:13px;transition:.2s}
+.lb-item.is-you{background:linear-gradient(135deg,rgba(212,168,67,.1),rgba(212,168,67,.03));border-color:var(--gold-dk);box-shadow:0 0 20px rgba(212,168,67,.08)}
+.lb-item.is-rival{border-color:var(--crimson);background:rgba(255,50,50,.05)}
+.lb-rank{font-size:.82rem;font-weight:700;color:var(--muted);min-width:22px;text-align:center}
+.lb-rank.g{color:#FFD700;font-size:1rem}
+.lb-rank.s{color:#C0C0C0;font-size:.95rem}
+.lb-rank.b{color:#CD7F32;font-size:.9rem}
+.lb-av{width:38px;height:38px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.lb-inf{flex:1}
+.lb-nm{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:1px}
+.lb-rnk-nm{font-size:.7rem;color:var(--dim)}
+.rival-badge{background:var(--crimson);color:#fff;padding:2px 7px;border-radius:7px;font-size:.62rem;margin-left:6px;font-weight:700}
+.lb-xp{text-align:right}
+.lb-xp-v{font-size:.92rem;font-weight:700;color:var(--gold);display:block}
+.lb-xp-l{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.lb-empty{text-align:center;padding:24px;color:var(--muted);font-size:.82rem;line-height:1.5}
+.star-p{position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);line-height:1;animation:starFly .85s cubic-bezier(.2,0,.8,1) forwards}
+@keyframes starFly{0%{opacity:1;transform:translate(-50%,-50%) scale(2)}60%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.1)}}
+.xp-pop{position:fixed;pointer-events:none;z-index:9990;font-size:1rem;font-weight:700;color:var(--gold);text-shadow:0 0 12px rgba(212,168,67,.7);animation:xpRise .9s ease-out forwards}
+@keyframes xpRise{0%{opacity:1;transform:translateY(0) scale(1.2)}100%{opacity:0;transform:translateY(-55px) scale(.8)}}
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:100;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(2px)}
+.backdrop.open{display:flex}
+.sheet{background:var(--surface);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:22px 20px calc(40px + env(safe-area-inset-bottom,0px));width:100%;max-width:430px;max-height:88vh;overflow-y:auto;animation:sUp .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes sUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.sh-handle{width:34px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 18px}
+.sh-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:700;color:var(--text);margin-bottom:18px;text-align:center}
+.form-f{margin-bottom:14px}
+.form-lbl{display:block;font-size:.7rem;font-weight:600;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
+.form-inp{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:11px;padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.92rem;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+.form-inp:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,67,.1)}
+.form-inp option{background:var(--surface)}
+.btn-gold{width:100%;padding:15px;background:linear-gradient(135deg,var(--gold-lt),var(--gold),var(--gold-dk));color:#080608;border:none;border-radius:13px;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:.2s;margin-top:6px}
+.btn-gold:active{transform:scale(.98)}
+.btn-ghost{width:100%;padding:13px;background:transparent;color:var(--dim);border:1px solid var(--border2);border-radius:13px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;margin-top:8px;transition:.2s}
+.btn-ghost:active{border-color:var(--gold);color:var(--gold)}
+#ob{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 30px;text-align:center}
+.ob-emoji-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;width:100%;margin-bottom:24px}
+.ob-emoji-opt{font-size:1.8rem;padding:11px 0;background:var(--surface2);border:2px solid var(--border2);border-radius:13px;cursor:pointer;transition:.2s;text-align:center;line-height:1}
+.ob-emoji-opt:active{transform:scale(.92)}
+.ob-emoji-opt.sel{border-color:var(--gold);background:rgba(212,168,67,.13);box-shadow:0 0 14px rgba(212,168,67,.28)}
+.ob-logo{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:700;background:linear-gradient(135deg,var(--gold-lt),var(--gold),var(--gold-dk));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:8px;margin-bottom:6px}
+.ob-tag{font-size:.7rem;color:var(--dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:48px}
+.ob-step{display:none;flex-direction:column;align-items:center;width:100%}
+.ob-step.active{display:flex}
+.ob-emoji{font-size:4rem;margin-bottom:22px;filter:drop-shadow(0 0 22px rgba(212,168,67,.55))}
+.ob-ttl{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:var(--text);margin-bottom:10px;line-height:1.2}
+.ob-desc{font-size:.85rem;color:var(--dim);line-height:1.65;margin-bottom:32px}
+.ob-input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:13px;padding:14px 18px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;outline:none;text-align:center;margin-bottom:20px;transition:border-color .2s;-webkit-appearance:none}
+.ob-input:focus{border-color:var(--gold)}
+.notif-skip{background:none;border:none;color:var(--muted);font-size:.8rem;cursor:pointer;margin-top:16px;font-family:'DM Sans',sans-serif;text-decoration:underline}
+#ru-scene{position:fixed;inset:0;background:#000;z-index:300;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center}
+#ru-scene.show{display:flex}
+.curtain-l,.curtain-r{position:absolute;top:0;width:50%;height:100%;z-index:1;transition:transform 1.3s cubic-bezier(.4,0,.2,1)}
+.curtain-l{left:0;background:linear-gradient(to right,#1a0808,#08000e);transform:translateX(0)}
+.curtain-r{right:0;background:linear-gradient(to left,#1a0808,#08000e);transform:translateX(0)}
+#ru-scene.open .curtain-l{transform:translateX(-100%)}
+#ru-scene.open .curtain-r{transform:translateX(100%)}
+.ru-content{position:relative;z-index:2;opacity:0;transition:opacity .7s 1.5s;padding:20px}
+#ru-scene.open .ru-content{opacity:1}
+.ru-emoji{font-size:6rem;display:block;margin-bottom:14px;animation:rPulse 1.2s ease-in-out infinite alternate;filter:drop-shadow(0 0 35px rgba(212,168,67,.9))}
+@keyframes rPulse{from{transform:scale(1)}to{transform:scale(1.12)}}
+.ru-pre{font-size:.72rem;color:var(--dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+.ru-title{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:700;color:var(--gold);margin-bottom:6px}
+.ru-sub{font-size:.88rem;color:var(--dim);margin-bottom:38px;line-height:1.5}
+.ru-btn{padding:15px 50px;background:linear-gradient(135deg,var(--gold-lt),var(--gold));color:#000;border:none;border-radius:30px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;letter-spacing:.5px}
+#rel-scene{position:fixed;inset:0;background:#06020a;z-index:300;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px}
+#rel-scene.show{display:flex}
+.rel-emoji{font-size:5rem;display:block;margin-bottom:14px;animation:relFall .8s ease-in}
+@keyframes relFall{0%{transform:translateY(-60px);opacity:0}100%{transform:translateY(0);opacity:1}}
+.rel-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:var(--crimson);margin-bottom:8px}
+.rel-sub{font-size:.85rem;color:var(--dim);margin-bottom:12px;line-height:1.5}
+.rel-new{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--text);margin-bottom:36px}
+.rel-btn{padding:15px 50px;background:var(--crimson);color:var(--text);border:none;border-radius:30px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer}
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-12px);background:linear-gradient(135deg,var(--gold-lt),var(--gold));color:#060408;padding:9px 22px;border-radius:30px;font-weight:700;font-size:.92rem;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(212,168,67,.35)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.sp{height:16px}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:16px 0}
+.acct-del{background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;padding:6px;border-radius:8px;transition:.2s;flex-shrink:0;line-height:1}
+.acct-del:active{color:var(--crimson);background:rgba(192,57,43,.12)}
+.ob-back{background:none;border:none;color:var(--dim);font-size:.82rem;cursor:pointer;margin-top:14px;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;padding:6px 0;transition:color .2s}
+.ob-back:active{color:var(--gold)}
+.ob-back-wrap{display:none;width:100%;align-items:center;margin-bottom:16px}
+.ob-back-wrap.show{display:flex}
+</style>
+</head>
+<body>
+
+<div id="ob">
+  <div class="ob-logo">STAGE</div>
+  <div class="ob-tag">Your Acting Journey</div>
+  <div class="ob-back-wrap" id="ob-back-wrap">
+    <button class="ob-back" onclick="cancelNewAccount()">‹ Back to accounts</button>
+  </div>
+  <div class="ob-step active" id="ob-s1">
+    <div class="ob-emoji">🎭</div>
+    <div class="ob-ttl">What's your name,<br>future star?</div>
+    <div class="ob-desc">Every great actor has a name the world will remember. What's yours?</div>
+    <input class="ob-input" id="ob-name" placeholder="Enter your name…" maxlength="24" autocomplete="off">
+    <button class="btn-gold" onclick="obStep2()">Continue</button>
+  </div>
+  <div class="ob-step" id="ob-s2">
+    <div class="ob-emoji" id="ob-chosen-emoji">🎤</div>
+    <div class="ob-ttl">Pick your avatar</div>
+    <div class="ob-desc">This is how the world will see you on the leaderboard.</div>
+    <div class="ob-emoji-grid" id="ob-emoji-grid"></div>
+    <button class="btn-gold" onclick="obStep3()">Continue</button>
+  </div>
+  <div class="ob-step" id="ob-s3">
+    <div class="ob-emoji">🔔</div>
+    <div class="ob-ttl">Stay on track<br>with reminders</div>
+    <div class="ob-desc">Get notified when it's time to practise, so you never miss a session.</div>
+    <button class="btn-gold" onclick="enableNotifs()">Enable Reminders</button>
+    <button class="notif-skip" onclick="obFinish()">Skip for now</button>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <header class="hdr">
+    <div class="hdr-logo">STAGE</div>
+    <div class="hdr-right">
+      <button class="hdr-acct-btn" onclick="openSheet('accounts')" title="Accounts">👤</button>
+      <div class="hdr-ring-wrap">
+        <div class="ring-cont" id="hdr-ring-cont">
+          <svg class="ring-svg" viewBox="0 0 36 36">
+            <circle class="ring-bg" cx="18" cy="18" r="15" fill="none" stroke-width="2.5"/>
+            <circle class="ring-prog" cx="18" cy="18" r="15" fill="none" stroke-width="2.5"
+              stroke-linecap="round" transform="rotate(-90 18 18)"
+              id="hdr-ring-prog" style="stroke-dasharray:94.25;stroke-dashoffset:94.25"/>
+          </svg>
+          <span class="ring-emoji" id="hdr-emoji">🌱</span>
+        </div>
+        <span class="hdr-rank-nm" id="hdr-rname">Wannabe</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="pages" id="pages">
+    <div class="pages-wrap" id="pw">
+      <div class="page" id="pg-home">
+        <div class="coach-box">
+          <div class="coach-av">🎭</div>
+          <div>
+            <div class="coach-nm">Your Coach</div>
+            <div class="coach-txt" id="coach-msg">Loading…</div>
+          </div>
+        </div>
+        <div class="rank-card">
+          <div class="rank-emblem">
+            <span class="rank-emoji-lg" id="rank-emoji-lg">🌱</span>
+            <span class="rank-name-lg gold-shine" id="rank-name-lg">Wannabe</span>
+          </div>
+          <div class="xp-row">
+            <span class="xp-val" id="xp-val">0 XP</span>
+            <span class="xp-next-lbl" id="xp-next-lbl">— to next rank</span>
+          </div>
+          <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+          <div class="prog-meta"><span id="prog-cur">0</span><span id="prog-nxt">500 XP to Rookie</span></div>
+        </div>
+        <div class="stats3">
+          <div class="stat-pill"><span class="sp-ico">🔥</span><span class="sp-val" id="stat-streak">0</span><span class="sp-lbl">Streak</span></div>
+          <div class="stat-pill"><span class="sp-ico">✅</span><span class="sp-val" id="stat-tasks">0</span><span class="sp-lbl">Done</span></div>
+          <div class="stat-pill"><span class="sp-ico">🎬</span><span class="sp-val" id="stat-aud">0</span><span class="sp-lbl">Auditions</span></div>
+        </div>
+        <div class="sec-hdr">
+          <span class="sec-title">Today's Practice</span>
+          <button class="add-btn" onclick="openSheet('add-task')">+ Add Task</button>
+        </div>
+        <div class="task-list" id="task-list">
+          <div class="empty"><span class="empty-ico">📋</span><span class="empty-txt">No tasks yet.<br>Add your first practice session!</span></div>
+        </div>
+        <div class="sp"></div>
+      </div>
+
+      <div class="page" id="pg-cal">
+        <div class="cal-nav">
+          <button class="cal-btn" onclick="calNav(-1)">‹</button>
+          <span class="cal-month" id="cal-month">May 2026</span>
+          <button class="cal-btn" onclick="calNav(1)">›</button>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+        <div class="sec-hdr">
+          <span class="sec-title">Upcoming Events</span>
+          <button class="add-btn" onclick="openSheet('add-event')">+ Add</button>
+        </div>
+        <div id="event-list">
+          <div class="empty"><span class="empty-ico">🎬</span><span class="empty-txt">No auditions or events yet.<br>Add your first one!</span></div>
+        </div>
+        <div class="sp"></div>
+      </div>
+
+      <div class="page" id="pg-goals">
+        <div class="sec-hdr" style="margin-bottom:16px">
+          <span class="sec-title" style="font-size:1.3rem">Daily Goals</span>
+          <span style="font-size:.7rem;color:var(--dim)">+50 XP each</span>
+        </div>
+        <div id="goals-list"></div>
+        <div class="sp"></div>
+      </div>
+
+      <div class="page" id="pg-lb">
+        <div class="lb-hdr">
+          <div class="lb-ttl gold-shine">Leaderboard</div>
+          <div class="lb-sub" id="lb-sub-txt">Rankings this month</div>
+        </div>
+        <div id="rival-card-wrap"></div>
+        <div class="lb-rank-filter" id="lb-rank-filter"></div>
+        <div id="lb-list"></div>
+        <div class="sp"></div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="tabbar">
+    <button class="tab active" id="tab-0" onclick="goTab(0)"><span class="tab-ico">🏠</span><span class="tab-lbl">Home</span></button>
+    <button class="tab" id="tab-1" onclick="goTab(1)"><span class="tab-ico">📅</span><span class="tab-lbl">Calendar</span></button>
+    <button class="tab" id="tab-2" onclick="goTab(2)"><span class="tab-ico">🎯</span><span class="tab-lbl">Goals</span></button>
+    <button class="tab" id="tab-3" onclick="goTab(3)"><span class="tab-ico">🏅</span><span class="tab-lbl">Ranks</span></button>
+  </nav>
+</div>
+
+<!-- ACCOUNTS SHEET -->
+<div class="backdrop" id="sheet-accounts">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="sh-title">Accounts</div>
+    <div id="acct-list"></div>
+    <div class="acct-new" onclick="newAccount()">＋ Add new account</div>
+    <div class="acct-logout" onclick="logoutAccount()">⏻ Log out of this account</div>
+  </div>
+</div>
+
+<!-- ADD TASK SHEET -->
+<div class="backdrop" id="sheet-add-task">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="sh-title">Add Practice Task</div>
+    <div class="form-f"><label class="form-lbl">Task Name</label><input class="form-inp" id="t-name" placeholder="e.g. Voice warm-up" autocomplete="off"></div>
+    <div class="form-f"><label class="form-lbl">Category</label>
+      <select class="form-inp" id="t-cat">
+        <option value="acting">🎭 Acting</option><option value="singing">🎤 Singing</option>
+        <option value="dancing">💃 Dancing</option><option value="piano">🎹 Piano</option>
+        <option value="fitness">💪 Fitness</option><option value="study">📖 Script Study</option>
+        <option value="other">✨ Other</option>
+      </select></div>
+    <div class="form-f"><label class="form-lbl">Time</label><input class="form-inp" id="t-time" type="time" value="09:00"></div>
+    <div class="form-f"><label class="form-lbl">Duration (minutes)</label><input class="form-inp" id="t-dur" type="number" value="60" min="5" max="300"></div>
+    <div class="form-f"><label class="form-lbl">XP Reward</label>
+      <select class="form-inp" id="t-xp">
+        <option value="20">Light (20 XP)</option><option value="40" selected>Medium (40 XP)</option>
+        <option value="75">Hard (75 XP)</option><option value="120">Intense (120 XP)</option>
+      </select></div>
+    <button class="btn-gold" onclick="addTask()">Add Task</button>
+    <button class="btn-ghost" onclick="closeSheet('add-task')">Cancel</button>
+  </div>
+</div>
+
+<!-- ADD EVENT SHEET -->
+<div class="backdrop" id="sheet-add-event">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="sh-title">Add Audition / Event</div>
+    <div class="form-f"><label class="form-lbl">Event Title</label><input class="form-inp" id="e-name" placeholder="e.g. Netflix Drama Audition" autocomplete="off"></div>
+    <div class="form-f"><label class="form-lbl">Date</label><input class="form-inp" id="e-date" type="date"></div>
+    <div class="form-f"><label class="form-lbl">Time</label><input class="form-inp" id="e-time" type="time" value="10:00"></div>
+    <div class="form-f"><label class="form-lbl">Type</label>
+      <select class="form-inp" id="e-type">
+        <option value="audition">🎬 Audition</option><option value="callback">📞 Callback</option>
+        <option value="workshop">📚 Workshop</option><option value="performance">🎭 Performance</option>
+      </select></div>
+    <div class="form-f"><label class="form-lbl">Notes</label><input class="form-inp" id="e-notes" placeholder="Any prep notes…" autocomplete="off"></div>
+    <button class="btn-gold" onclick="addEvent()">Add Event</button>
+    <button class="btn-ghost" onclick="closeSheet('add-event')">Cancel</button>
+  </div>
+</div>
+
+<div id="ru-scene">
+  <div class="curtain-l"></div><div class="curtain-r"></div>
+  <div class="ru-content">
+    <span class="ru-emoji" id="ru-emoji">⭐</span>
+    <div class="ru-pre">You've been promoted to</div>
+    <div class="ru-title" id="ru-title">Rising Star</div>
+    <div class="ru-sub" id="ru-sub">Keep pushing. The spotlight is waiting.</div>
+    <button class="ru-btn" onclick="closeRankUp()">Keep Going →</button>
+  </div>
+</div>
+
+<div id="rel-scene">
+  <span class="rel-emoji" id="rel-emoji">⬇️</span>
+  <div class="rel-title">Relegated</div>
+  <div class="rel-sub" id="rel-sub">You missed sessions and lost XP.<br>Champions don't quit.</div>
+  <div class="rel-new" id="rel-new">You are now: Wannabe 🌱</div>
+  <button class="rel-btn" onclick="closeRelegate()">I'll Come Back Stronger</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══ CONSTANTS ══ */
+const RANKS = [
+  {key:'wannabe', name:'Wannabe',     emoji:'🌱', minXP:0,     next:500},
+  {key:'rookie',  name:'Rookie',      emoji:'🎭', minXP:500,   next:1500},
+  {key:'rising',  name:'Rising Star', emoji:'⭐', minXP:1500,  next:4000},
+  {key:'semipro', name:'Semi-Pro',    emoji:'🎬', minXP:4000,  next:8000},
+  {key:'pro',     name:'Pro',         emoji:'🏆', minXP:8000,  next:15000},
+  {key:'elite',   name:'Elite',       emoji:'💎', minXP:15000, next:25000},
+  {key:'allstar', name:'All-Star',    emoji:'🌟', minXP:25000, next:50000},
+  {key:'legend',  name:'Legend',      emoji:'👑', minXP:50000, next:null}
+];
+const CAT_ICONS = {acting:'🎭',singing:'🎤',dancing:'💃',piano:'🎹',fitness:'💪',study:'📖',other:'✨'};
+const CAT_GOAL  = {acting:'Acting Practice',singing:'Singing',dancing:'Dance',piano:'Piano',fitness:'Fitness'};
+const AI_BOARD = [
+  {name:'DaisyFirst',   av:'🌷', xp:28,   gain:[7,  22],  isRival:false},
+  {name:'ActorKid99',   av:'🎪', xp:55,   gain:[9,  26],  isRival:false},
+  {name:'StageFright',  av:'😬', xp:82,   gain:[10, 29],  isRival:false},
+  {name:'BellaVoice',   av:'🌸', xp:105,  gain:[11, 31],  isRival:false},
+  {name:'JustStarted',  av:'🐣', xp:128,  gain:[11, 32],  isRival:false},
+  {name:'TheatreKid',   av:'🎨', xp:150,  gain:[12, 34],  isRival:false},
+  {name:'TryingActor',  av:'🧢', xp:172,  gain:[13, 36],  isRival:false},
+  {name:'MiloScene',    av:'🎵', xp:195,  gain:[13, 37],  isRival:false},
+  {name:'ZaraDebuts',   av:'🦋', xp:218,  gain:[14, 38],  isRival:false},
+  {name:'OliviaDrama',  av:'🌺', xp:238,  gain:[14, 39],  isRival:false},
+  {name:'FoxOnStage',   av:'🦊', xp:255,  gain:[15, 40],  isRival:false},
+  {name:'LeoFirstAct',  av:'🦁', xp:272,  gain:[15, 41],  isRival:false},
+  {name:'HarrietSings', av:'🎀', xp:290,  gain:[16, 42],  isRival:false},
+  {name:'CharlieActs',  av:'🌙', xp:308,  gain:[16, 43],  isRival:false},
+  {name:'RivaStage',    av:'💫', xp:320,  gain:[20, 52],  isRival:true },
+  {name:'NovaCast',     av:'⚡', xp:338,  gain:[17, 44],  isRival:false},
+  {name:'FinnDrama',    av:'🎯', xp:355,  gain:[17, 45],  isRival:false},
+  {name:'RubySpotlight',av:'💄', xp:372,  gain:[18, 46],  isRival:false},
+  {name:'PippaStage',   av:'🌊', xp:390,  gain:[18, 47],  isRival:false},
+  {name:'MaxCallbacks', av:'🏹', xp:410,  gain:[19, 48],  isRival:false},
+  {name:'IslaPerforms', av:'🌠', xp:428,  gain:[19, 49],  isRival:false},
+  {name:'TomTreads',    av:'🎩', xp:448,  gain:[19, 50],  isRival:false},
+  {name:'GraceWings',   av:'🕊', xp:468,  gain:[20, 51],  isRival:false},
+  {name:'AlexFirstCall',av:'🎬', xp:482,  gain:[20, 51],  isRival:false},
+  {name:'NewToThis',    av:'🌱', xp:540,  gain:[28, 68],  isRival:false},
+  {name:'CoopDrama',    av:'🎤', xp:680,  gain:[32, 80],  isRival:false},
+  {name:'RedCurtain',   av:'🔴', xp:820,  gain:[35, 88],  isRival:false},
+  {name:'AshPerforms',  av:'🌊', xp:960,  gain:[38, 95],  isRival:false},
+  {name:'LexiStage',    av:'🎀', xp:1100, gain:[42, 100], isRival:false},
+  {name:'OscarWilde2',  av:'🎩', xp:1280, gain:[45, 105], isRival:false},
+  {name:'RoxyRehearse', av:'💄', xp:1400, gain:[48, 110], isRival:false},
+  {name:'LenaPerform',  av:'✨', xp:1700, gain:[65, 150],  isRival:false},
+  {name:'BlakeCast',    av:'🌠', xp:2100, gain:[72, 165],  isRival:false},
+  {name:'VioletScene',  av:'💜', xp:2600, gain:[80, 180],  isRival:false},
+  {name:'KaiTheatre',   av:'🦅', xp:3100, gain:[88, 195],  isRival:false},
+  {name:'SiennaDrama',  av:'🍂', xp:3700, gain:[92, 205],  isRival:false},
+  {name:'SkyActing',    av:'🎬', xp:4400, gain:[115, 240], isRival:false},
+  {name:'BlueMask',     av:'🎭', xp:5800, gain:[130, 270], isRival:false},
+  {name:'DexterCalls',  av:'📞', xp:7200, gain:[145, 300], isRival:false},
+  {name:'JaxTheatre',   av:'🎭', xp:9200, gain:[160, 330], isRival:false},
+  {name:'VeronicaActs', av:'💃', xp:12400,gain:[175, 355], isRival:false},
+  {name:'MarcellaV',    av:'🌟', xp:18000,gain:[200, 400], isRival:false},
+  {name:'GoldMicDario', av:'🎙', xp:22000,gain:[210, 420], isRival:false},
+  {name:'LegacyActs',   av:'👑', xp:31000,gain:[240, 480], isRival:false},
+  {name:'TheBardReborn',av:'🌍', xp:44000,gain:[260, 500], isRival:false},
+];
+const DEFAULT_GOALS = [
+  {id:'g1',title:'Acting Practice',icon:'🎭',target:60,current:0,streak:0,cat:'acting'},
+  {id:'g2',title:'Singing',        icon:'🎤',target:30,current:0,streak:0,cat:'singing'},
+  {id:'g3',title:'Dance',          icon:'💃',target:60,current:0,streak:0,cat:'dancing'},
+  {id:'g4',title:'Piano',          icon:'🎹',target:60,current:0,streak:0,cat:'piano'},
+  {id:'g5',title:'Fitness',        icon:'💪',target:45,current:0,streak:0,cat:'fitness'},
+];
+
+/* ══ STATE ══ */
+function defState() {
+  return {
+    onboarded:false, user:{name:'',xp:0,streak:0,tasksDone:0,avatar:'🎤'},
+    rankKey:'wannabe', tasks:[], events:[],
+    goals:JSON.parse(JSON.stringify(DEFAULT_GOALS)),
+    lastDate:null, notifEnabled:false, lastGoalDate:null,
+    aiXP:null, aiXPDate:null
+  };
+}
+let S = loadState();
+let calYear=2026, calMonth=4, curTab=0;
+
+function loadState(){try{const r=localStorage.getItem('stage_v3');if(r)return JSON.parse(r);}catch(e){}return defState();}
+function save(){try{localStorage.setItem('stage_v3',JSON.stringify(S));}catch(e){}}
+
+/* ══ MULTI-ACCOUNT ══ */
+function getAllAccounts(){
+  try{const r=localStorage.getItem('stage_accounts');if(r)return JSON.parse(r);}catch(e){}
+  return [];
+}
+function saveAllAccounts(accts){localStorage.setItem('stage_accounts',JSON.stringify(accts));}
+function getCurrentAccountId(){return localStorage.getItem('stage_current_acct')||null;}
+function setCurrentAccountId(id){localStorage.setItem('stage_current_acct',id);}
+
+function renderAccounts(){
+  const el=document.getElementById('acct-list');
+  const accts=getAllAccounts();
+  const curId=getCurrentAccountId();
+  if(!accts.length){el.innerHTML='<div style="text-align:center;padding:12px 0 16px;font-size:.82rem;color:var(--dim)">No saved accounts yet.</div>';return;}
+  el.innerHTML=accts.map(function(a){
+    const isCur=a.id===curId;
+    const rk=RANKS[getRankIndex(a.xp)]||RANKS[0];
+    return '<div class="acct-item'+(isCur?' current':'')+'" onclick="switchAccount(\''+a.id+'\')">'
+      +'<div class="acct-av">'+a.avatar+'</div>'
+      +'<div class="acct-inf">'
+        +'<div class="acct-nm">'+esc(a.name)+(isCur?'<span class="acct-badge">Active</span>':'')+'</div>'
+        +'<div class="acct-xp">'+rk.emoji+' '+rk.name+' · '+a.xp.toLocaleString()+' XP</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function switchAccount(id){
+  if(id===getCurrentAccountId()){closeSheet('accounts');return;}
+  // Save current state under current id
+  const curId=getCurrentAccountId();
+  if(curId){
+    const accts=getAllAccounts();
+    const idx=accts.findIndex(function(a){return a.id===curId;});
+    if(idx>=0){accts[idx]={id:curId,name:S.user.name,avatar:S.user.avatar||'🎤',xp:S.user.xp,state:JSON.stringify(S)};saveAllAccounts(accts);}
+  }
+  // Load selected account
+  const accts=getAllAccounts();
+  const target=accts.find(function(a){return a.id===id;});
+  if(target&&target.state){
+    try{S=JSON.parse(target.state);}catch(e){S=defState();}
+    localStorage.setItem('stage_v3',JSON.stringify(S));
+    setCurrentAccountId(id);
+    closeSheet('accounts');
+    renderAll();
+    showToast('Switched to '+target.name);
+  }
+}
+
+function newAccount(){
+  // Save current account first
+  saveCurrentAccountToList();
+  // Reset state and show onboarding
+  S=defState();
+  localStorage.removeItem('stage_v3');
+  localStorage.removeItem('stage_current_acct');
+  closeSheet('accounts');
+  document.getElementById('app').style.display='none';
+  document.getElementById('ob').style.display='flex';
+  document.getElementById('ob-s1').classList.add('active');
+  document.getElementById('ob-s2').classList.remove('active');
+  document.getElementById('ob-s3').classList.remove('active');
+  document.getElementById('ob-name').value='';
+  selectedAvatar='🎤';
+}
+
+function logoutAccount(){
+  if(!confirm('Log out? Your progress is saved and you can switch back anytime.'))return;
+  saveCurrentAccountToList();
+  S=defState();
+  localStorage.removeItem('stage_v3');
+  localStorage.removeItem('stage_current_acct');
+  closeSheet('accounts');
+  document.getElementById('app').style.display='none';
+  document.getElementById('ob').style.display='flex';
+  document.getElementById('ob-s1').classList.add('active');
+  document.getElementById('ob-s2').classList.remove('active');
+  document.getElementById('ob-s3').classList.remove('active');
+  document.getElementById('ob-name').value='';
+  selectedAvatar='🎤';
+}
+
+function saveCurrentAccountToList(){
+  const curId=getCurrentAccountId();
+  const accts=getAllAccounts();
+  if(curId){
+    const idx=accts.findIndex(function(a){return a.id===curId;});
+    const entry={id:curId,name:S.user.name,avatar:S.user.avatar||'🎤',xp:S.user.xp,state:JSON.stringify(S)};
+    if(idx>=0)accts[idx]=entry;else accts.push(entry);
+  }
+  saveAllAccounts(accts);
+}
+
+/* ══ AI XP ══ */
+function initAiXP(){
+  if(!S.aiXP){S.aiXP={};AI_BOARD.forEach(function(p){S.aiXP[p.name]=p.xp;});S.aiXPDate=todayStr();save();}
+}
+function updateAiXP(){
+  initAiXP();
+  const today=todayStr();
+  if(S.aiXPDate===today)return;
+  const last=new Date(S.aiXPDate+'T00:00:00');
+  const now=new Date(today+'T00:00:00');
+  const days=Math.max(1,Math.min(Math.round((now-last)/86400000),60));
+  AI_BOARD.forEach(function(p){
+    const mn=p.gain[0],mx=p.gain[1];
+    for(let d=0;d<days;d++)S.aiXP[p.name]=(S.aiXP[p.name]||p.xp)+Math.floor(mn+Math.random()*(mx-mn));
+  });
+  S.aiXPDate=today;save();
+}
+function getAiPlayers(){
+  initAiXP();
+  return AI_BOARD.map(function(p){return Object.assign({},p,{xp:S.aiXP[p.name]||p.xp});});
+}
+
+/* ══ ONBOARDING ══ */
+const AVATAR_OPTS=['🎤','🎭','🌟','💃','🦁','🐆','🦅','🌸','🌊','🔥','💎','🏆','🌙','⚡','🦋','🎵','🎯','🌺','🎪','🦊'];
+let selectedAvatar='🎤';
+function buildEmojiGrid(){
+  const grid=document.getElementById('ob-emoji-grid');if(!grid)return;
+  grid.innerHTML='';
+  AVATAR_OPTS.forEach(function(e){
+    const d=document.createElement('div');d.className='ob-emoji-opt'+(e===selectedAvatar?' sel':'');d.textContent=e;
+    d.addEventListener('click',function(){pickAvatar(e);});grid.appendChild(d);
+  });
+}
+function pickAvatar(e){
+  selectedAvatar=e;document.getElementById('ob-chosen-emoji').textContent=e;
+  document.querySelectorAll('.ob-emoji-opt').forEach(function(el){el.classList.toggle('sel',el.textContent===e);});
+}
+function obStep2(){
+  const nm=document.getElementById('ob-name').value.trim();if(!nm){document.getElementById('ob-name').focus();return;}
+  S.user.name=nm;save();
+  document.getElementById('ob-s1').classList.remove('active');
+  document.getElementById('ob-s2').classList.add('active');
+  buildEmojiGrid();
+}
+function obStep3(){
+  S.user.avatar=selectedAvatar;save();
+  document.getElementById('ob-s2').classList.remove('active');
+  document.getElementById('ob-s3').classList.add('active');
+}
+async function enableNotifs(){
+  if('Notification'in window){const p=await Notification.requestPermission();S.notifEnabled=p==='granted';}
+  obFinish();
+}
+function obFinish(){
+  S.onboarded=true;S.lastDate=todayStr();S.lastGoalDate=todayStr();save();
+  // Register in accounts list
+  const id='acct_'+Date.now();
+  const accts=getAllAccounts();
+  accts.push({id:id,name:S.user.name,avatar:S.user.avatar||'🎤',xp:0,state:JSON.stringify(S)});
+  saveAllAccounts(accts);
+  setCurrentAccountId(id);
+  document.getElementById('ob').style.display='none';
+  document.getElementById('app').style.display='flex';
+  initApp();
+}
+
+/* ══ INIT ══ */
+function initApp(){updateAiXP();checkDailyPenalty();renderAll();setupSwipe();scheduleNotifs();}
+function todayStr(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+
+/* ══ DAILY CHECK ══ */
+function checkDailyPenalty(){
+  const today=todayStr();
+  if(!S.lastDate||S.lastDate===today){S.lastDate=today;return;}
+  const incomplete=S.tasks.filter(function(t){return t.date!==today&&!t.done;});
+  let lostXP=0;
+  incomplete.forEach(function(t){lostXP+=t.xp;t.done=true;});
+  if(lostXP>0){
+    S.user.xp=Math.max(0,S.user.xp-lostXP);
+    const oldRi=RANKS.findIndex(function(r){return r.key===S.rankKey;});
+    const newRi=getRankIndex(S.user.xp);
+    if(newRi<oldRi){S.rankKey=RANKS[newRi].key;save();showRelegate(RANKS[newRi]);}
+  }
+  if(S.lastGoalDate!==today){
+    S.goals.forEach(function(g){if(g.current>=g.target)g.streak++;else g.streak=0;g.current=0;});
+    S.lastGoalDate=today;
+  }
+  const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+  const yStr=`${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
+  S.user.streak=S.lastDate===yStr?(S.user.streak||0)+1:0;
+  S.lastDate=today;save();
+}
+
+/* ══ RANK HELPERS ══ */
+function getRankIndex(xp){let i=0;for(let j=RANKS.length-1;j>=0;j--){if(xp>=RANKS[j].minXP){i=j;break;}}return i;}
+function currentRank(){return RANKS.find(function(r){return r.key===S.rankKey;})||RANKS[0];}
+
+/* ══ NAVIGATION ══ */
+function goTab(i){
+  curTab=i;
+  document.getElementById('pw').style.transform=`translateX(-${i*25}%)`;
+  document.querySelectorAll('.tab').forEach(function(t,j){t.classList.toggle('active',j===i);});
+  if(i===2)renderGoals();if(i===3)renderLeaderboard();
+}
+function setupSwipe(){
+  const pages=document.getElementById('pages');let sx=0,sy=0,moved=false;
+  pages.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY;moved=false;},{passive:true});
+  pages.addEventListener('touchmove',function(e){const dx=e.touches[0].clientX-sx,dy=e.touches[0].clientY-sy;if(!moved&&Math.abs(dx)>Math.abs(dy))moved=true;},{passive:true});
+  pages.addEventListener('touchend',function(e){
+    if(!moved)return;const dx=sx-e.changedTouches[0].clientX;
+    if(Math.abs(dx)>55){if(dx>0&&curTab<3)goTab(curTab+1);else if(dx<0&&curTab>0)goTab(curTab-1);}
+  },{passive:true});
+}
+
+/* ══ RENDER ALL ══ */
+function renderAll(){renderHeader();renderRankCard();renderStats();renderTaskList();renderCalendar();renderEventList();renderGoals();renderLeaderboard();updateCoach();}
+
+/* ══ HEADER ══ */
+function renderHeader(){
+  const r=currentRank();const ri=getRankIndex(S.user.xp);const next=RANKS[ri+1];
+  document.getElementById('hdr-emoji').textContent=r.emoji;
+  document.getElementById('hdr-rname').textContent=r.name;
+  const ring=document.getElementById('hdr-ring-prog');
+  if(ring){
+    const circ=94.25;let pct=next?(S.user.xp-r.minXP)/(next.minXP-r.minXP):1;
+    ring.style.strokeDashoffset=circ*(1-Math.min(Math.max(pct,0),1));
+  }
+}
+
+/* ══ RANK CARD ══ */
+function renderRankCard(){
+  const r=currentRank();const ri=getRankIndex(S.user.xp);const next=RANKS[ri+1];
+  document.getElementById('rank-emoji-lg').textContent=r.emoji;
+  document.getElementById('rank-name-lg').textContent=r.name;
+  document.getElementById('xp-val').textContent=S.user.xp.toLocaleString()+' XP';
+  if(next){
+    const pct=Math.min(((S.user.xp-r.minXP)/(next.minXP-r.minXP))*100,100);
+    document.getElementById('prog-fill').style.width=pct+'%';
+    document.getElementById('prog-cur').textContent=S.user.xp.toLocaleString();
+    document.getElementById('prog-nxt').textContent=next.minXP.toLocaleString()+' XP → '+next.name;
+    document.getElementById('xp-next-lbl').textContent=(next.minXP-S.user.xp).toLocaleString()+' XP to '+next.name;
+  }else{
+    document.getElementById('prog-fill').style.width='100%';
+    document.getElementById('prog-nxt').textContent='Maximum Rank!';
+    document.getElementById('xp-next-lbl').textContent='MAX RANK';
+  }
+}
+
+/* ══ STATS ══ */
+function renderStats(){
+  document.getElementById('stat-streak').textContent=S.user.streak||0;
+  document.getElementById('stat-tasks').textContent=S.user.tasksDone||0;
+  document.getElementById('stat-aud').textContent=S.events.filter(function(e){return e.type==='audition'||e.type==='callback';}).length;
+}
+
+/* ══ TASKS ══ */
+function renderTaskList(){
+  const el=document.getElementById('task-list');
+  const today=todayStr();
+  const todayTasks=S.tasks.filter(function(t){return t.date===today;});
+  if(!todayTasks.length){el.innerHTML='<div class="empty"><span class="empty-ico">📋</span><span class="empty-txt">No tasks yet.<br>Add your first practice session!</span></div>';return;}
+  todayTasks.sort(function(a,b){return a.time.localeCompare(b.time);});
+  el.innerHTML=todayTasks.map(function(t){
+    return '<div class="task-item '+(t.done?'done':'')+'" onclick="toggleTask(\''+t.id+'\')"><div class="task-chk">'+(t.done?'✓':'')+'</div><span class="task-cat-ico">'+(CAT_ICONS[t.cat]||'✨')+'</span><div class="task-inf"><div class="task-nm">'+esc(t.name)+'</div><div class="task-meta">'+fmtTime(t.time)+' · '+t.dur+' min</div></div><span class="task-xp">+'+t.xp+' XP</span></div>';
+  }).join('');
+}
+function fmtTime(t){if(!t)return '';const p=t.split(':');const hr=parseInt(p[0]),ap=hr>=12?'PM':'AM';return (hr%12||12)+':'+p[1]+' '+ap;}
+function toggleTask(id){
+  const t=S.tasks.find(function(t){return t.id===id;});if(!t||t.done)return;
+  t.done=true;S.user.xp+=t.xp;S.user.tasksDone=(S.user.tasksDone||0)+1;
+  const g=S.goals.find(function(g){return g.title===CAT_GOAL[t.cat];});if(g)g.current=Math.min(g.current+t.dur,g.target*2);
+  const oldRi=RANKS.findIndex(function(r){return r.key===S.rankKey;});
+  const newRi=getRankIndex(S.user.xp);
+  if(newRi>oldRi){S.rankKey=RANKS[newRi].key;save();showRankUp(RANKS[newRi]);}
+  const items=document.querySelectorAll('.task-item');let el=null;
+  items.forEach(function(i){if(i.querySelector('.task-nm')&&i.querySelector('.task-nm').textContent===t.name)el=i;});
+  if(el){const r=el.getBoundingClientRect();xpPop(r.left+r.width/2,r.top+r.height/2,'+'+t.xp+' XP');}
+  showToast('+'+t.xp+' XP earned!');save();scheduleNotifs();renderAll();
+}
+function addTask(){
+  const nm=document.getElementById('t-name').value.trim();if(!nm){document.getElementById('t-name').focus();return;}
+  const today=todayStr();
+  S.tasks.push({id:'t'+Date.now(),name:nm,cat:document.getElementById('t-cat').value,time:document.getElementById('t-time').value,dur:parseInt(document.getElementById('t-dur').value)||60,xp:parseInt(document.getElementById('t-xp').value)||40,done:false,date:today});
+  save();closeSheet('add-task');document.getElementById('t-name').value='';renderTaskList();renderStats();scheduleNotifs();
+}
+
+/* ══ CALENDAR ══ */
+function renderCalendar(){
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month').textContent=MONTHS[calMonth]+' '+calYear;
+  const grid=document.getElementById('cal-grid');grid.innerHTML='';
+  ['S','M','T','W','T','F','S'].forEach(function(d){const h=document.createElement('div');h.className='cal-dh';h.textContent=d;grid.appendChild(h);});
+  const first=new Date(calYear,calMonth,1).getDay(),last=new Date(calYear,calMonth+1,0).getDate(),prevLast=new Date(calYear,calMonth,0).getDate();
+  const td=new Date();
+  for(let i=first-1;i>=0;i--){const d=document.createElement('div');d.className='cal-d other';d.textContent=prevLast-i;grid.appendChild(d);}
+  for(let i=1;i<=last;i++){
+    const d=document.createElement('div');d.className='cal-d';
+    const ds=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(i).padStart(2,'0');
+    const evs=S.events.filter(function(e){return e.date===ds;});
+    if(calYear===td.getFullYear()&&calMonth===td.getMonth()&&i===td.getDate())d.classList.add('today');
+    if(evs.some(function(e){return e.type==='audition'||e.type==='callback';}))d.classList.add('has-aud');
+    else if(evs.length)d.classList.add('has-ev');
+    d.textContent=i;d.onclick=(function(s){return function(){showDayEvents(s);};})(ds);grid.appendChild(d);
+  }
+  const rem=42-(first+last);for(let i=1;i<=rem;i++){const d=document.createElement('div');d.className='cal-d other';d.textContent=i;grid.appendChild(d);}
+}
+function calNav(d){calMonth+=d;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+function showDayEvents(ds){const evs=S.events.filter(function(e){return e.date===ds;});if(!evs.length)return;alert(evs.map(function(e){return fmtTime(e.time)+' — '+e.name+' ('+e.type+')';}).join('\n'));}
+function renderEventList(){
+  const el=document.getElementById('event-list');
+  const upcoming=S.events.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
+  if(!upcoming.length){el.innerHTML='<div class="empty"><span class="empty-ico">🎬</span><span class="empty-txt">No auditions or events yet.</span></div>';return;}
+  const EV_ICO={audition:'🎬',callback:'📞',workshop:'📚',performance:'🎭'};
+  el.innerHTML=upcoming.map(function(e){return '<div class="ev-item '+e.type+'"><span class="ev-ico">'+(EV_ICO[e.type]||'📅')+'</span><div class="ev-inf"><div class="ev-nm">'+esc(e.name)+'</div><div class="ev-meta">'+fmtDate(e.date)+' · '+fmtTime(e.time)+(e.notes?' · '+esc(e.notes):'')+'</div></div></div>';}).join('');
+}
+function fmtDate(ds){if(!ds)return '';const d=new Date(ds+'T00:00:00');return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});}
+function addEvent(){
+  const nm=document.getElementById('e-name').value.trim();if(!nm){document.getElementById('e-name').focus();return;}
+  S.events.push({id:'ev'+Date.now(),name:nm,date:document.getElementById('e-date').value,time:document.getElementById('e-time').value,type:document.getElementById('e-type').value,notes:document.getElementById('e-notes').value.trim()});
+  save();closeSheet('add-event');document.getElementById('e-name').value='';document.getElementById('e-notes').value='';renderCalendar();renderEventList();renderStats();scheduleNotifs();
+}
+
+/* ══ GOALS ══ */
+function renderGoals(){
+  const el=document.getElementById('goals-list');
+  el.innerHTML=S.goals.map(function(g){
+    const pct=Math.min((g.current/g.target)*100,100);const done=g.current>=g.target;
+    return '<div class="goal-card'+(done?' completed':'')+'"><div class="goal-top"><div class="goal-left"><span class="goal-ico">'+g.icon+'</span><span class="goal-title">'+g.title+'</span></div><span class="goal-streak">🔥 '+g.streak+'</span></div><div class="goal-bar"><div class="goal-fill" style="width:'+pct+'%"></div></div><div class="goal-bottom"><div class="goal-meta"><span>'+g.current+'/'+g.target+' min</span><span>'+Math.round(pct)+'%</span></div><button class="goal-done-btn '+(done?'inactive':'active')+'" id="gdb-'+g.id+'">'+(done?'✓ Done':'Mark Done')+'</button></div></div>';
+  }).join('');
+  S.goals.forEach(function(g){
+    if(g.current<g.target){
+      const btn=document.getElementById('gdb-'+g.id);
+      if(btn)btn.onclick=function(e){completeGoal(g.id,btn,e);};
+    }
+  });
+}
+function completeGoal(id,btn,evt){
+  const g=S.goals.find(function(g){return g.id===id;});if(!g||g.current>=g.target)return;
+  g.current=g.target;const xpBonus=50;S.user.xp+=xpBonus;
+  const oldRi=RANKS.findIndex(function(r){return r.key===S.rankKey;});
+  const newRi=getRankIndex(S.user.xp);
+  if(newRi>oldRi){S.rankKey=RANKS[newRi].key;save();showRankUp(RANKS[newRi]);}
+  starBurst(btn);
+  const r=btn.getBoundingClientRect();xpPop(r.left+r.width/2,r.top,'+'+xpBonus+' XP');
+  showToast('Goal complete! +'+xpBonus+' XP ⭐');
+  save();renderGoals();renderRankCard();renderHeader();
+}
+
+/* ══ LEADERBOARD ══ */
+function renderLeaderboard(){
+  const aiPlayers=getAiPlayers();
+  const rival=aiPlayers.find(function(p){return p.isRival;});
+  const rivalXP=rival?rival.xp:0;
+  const userAv=S.user.avatar||'🎤';
+  const rcw=document.getElementById('rival-card-wrap');
+  const youXP=S.user.xp;const gap=rivalXP-youXP;const isAhead=gap<=0;
+  rcw.innerHTML='<div class="rival-card"><div class="rival-card-title">⚔ You vs Your Rival</div><div class="rival-vs-row"><div class="rival-side"><span class="rival-av">'+userAv+'</span><span class="rival-name">'+esc(S.user.name||'You')+'</span><span class="rival-xp">'+youXP.toLocaleString()+'</span></div><div class="rival-vs-sep">VS</div><div class="rival-side"><span class="rival-av">'+(rival?rival.av:'💫')+'</span><span class="rival-name">'+(rival?esc(rival.name):'RivaStage')+'</span><span class="rival-xp">'+rivalXP.toLocaleString()+'</span></div></div><div class="rival-gap-row"><span class="rival-gap-txt '+(isAhead?'ahead':'')+'">'+( isAhead?'You\'re <strong>'+Math.abs(gap).toLocaleString()+' XP</strong> ahead — don\'t let up! 🔥':'<strong>'+gap.toLocaleString()+' XP</strong> to overtake your rival')+'</span></div></div>';
+  const userRankIdx=getRankIndex(S.user.xp);
+  const allPlayers=aiPlayers.concat([{name:S.user.name||'You',av:userAv,xp:S.user.xp,isYou:true}]);
+  const sameRank=allPlayers.filter(function(p){return getRankIndex(p.xp)===userRankIdx;}).sort(function(a,b){return b.xp-a.xp;});
+  const rankInfo=RANKS[userRankIdx];
+  document.getElementById('lb-rank-filter').innerHTML='<div class="rank-filter-badge">'+rankInfo.emoji+' '+rankInfo.name+' Division</div>';
+  const el=document.getElementById('lb-list');
+  if(!sameRank.length){el.innerHTML='<div class="lb-empty">No other players at your rank yet.<br>Keep climbing! 🚀</div>';return;}
+  const RANK_CLS=['g','s','b'];
+  el.innerHTML=sameRank.map(function(u,i){
+    return '<div class="lb-item '+(u.isYou?'is-you':'')+' '+(u.isRival?'is-rival':'')+'"><div class="lb-rank '+(i<3?RANK_CLS[i]:'')+'">'+(i<3?['🥇','🥈','🥉'][i]:i+1)+'</div><div class="lb-av">'+u.av+'</div><div class="lb-inf"><div class="lb-nm">'+esc(u.name)+(u.isYou?' (You)':'')+(u.isRival?'<span class="rival-badge">⚔️ RIVAL</span>':'')+'</div><div class="lb-rnk-nm">'+rankInfo.emoji+' '+rankInfo.name+'</div></div><div class="lb-xp"><span class="lb-xp-v">'+u.xp.toLocaleString()+'</span><span class="lb-xp-l">XP</span></div></div>';
+  }).join('');
+}
+
+/* ══ COACH ══ */
+function updateCoach(){
+  const h=new Date().getHours();const name=S.user.name||'star';const today=todayStr();
+  const pending=S.tasks.filter(function(t){return t.date===today&&!t.done;}).length;
+  const done=S.tasks.filter(function(t){return t.date===today&&t.done;}).length;
+  const rival=getAiPlayers().find(function(p){return p.isRival;});
+  const rivalXP=rival?rival.xp:0;const gap=rivalXP-S.user.xp;
+  const greet=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  let msg=greet+', '+name+'! ';
+  if(pending>0)msg+=pending+' session'+(pending>1?'s':'')+' still to go today. ';
+  else if(done>0)msg+='All '+done+' session'+(done>1?'s':'')+' done today — that\'s elite work. ';
+  else msg+='No sessions yet — build your routine, build your legacy. ';
+  if(gap>0)msg+='Your rival is '+gap.toLocaleString()+' XP ahead. Close that gap. 💪';
+  else msg+='You\'re ahead of your rival. Stay sharp. ✨';
+  document.getElementById('coach-msg').textContent=msg;
+}
+
+/* ══ RANK-UP & RELEGATION ══ */
+function showRankUp(rank){
+  const sc=document.getElementById('ru-scene');
+  document.getElementById('ru-emoji').textContent=rank.emoji;document.getElementById('ru-title').textContent=rank.name;
+  const ri=RANKS.findIndex(function(r){return r.key===rank.key;});
+  document.getElementById('ru-sub').textContent=ri<RANKS.length-1?'Next stop: '+RANKS[ri+1].name+' '+RANKS[ri+1].emoji:'You\'ve reached the pinnacle.';
+  sc.classList.add('show');setTimeout(function(){sc.classList.add('open');},80);
+}
+function closeRankUp(){const sc=document.getElementById('ru-scene');sc.classList.remove('open','show');}
+function showRelegate(rank){
+  document.getElementById('rel-sub').textContent="You missed sessions and lost XP.\nChampions don't quit — they come back stronger.";
+  document.getElementById('rel-new').textContent='You are now: '+rank.name+' '+rank.emoji;
+  document.getElementById('rel-scene').classList.add('show');
+}
+function closeRelegate(){document.getElementById('rel-scene').classList.remove('show');renderAll();}
+
+/* ══ MODALS ══ */
+function openSheet(name){
+  document.getElementById('sheet-'+name).classList.add('open');
+  if(name==='add-event'){const d=new Date();document.getElementById('e-date').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  if(name==='accounts')renderAccounts();
+}
+function closeSheet(name){document.getElementById('sheet-'+name).classList.remove('open');}
+document.querySelectorAll('.backdrop').forEach(function(b){b.addEventListener('click',function(e){if(e.target===b)b.classList.remove('open');});});
+
+/* ══ ANIMATIONS ══ */
+function starBurst(el){
+  const rect=el.getBoundingClientRect();const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+  const glyphs=['⭐','✨','🌟','💫','★','✦'];const count=16;
+  for(let i=0;i<count;i++){
+    const star=document.createElement('div');star.className='star-p';
+    star.textContent=glyphs[Math.floor(Math.random()*glyphs.length)];
+    const angle=(i/count)*Math.PI*2;const dist=55+Math.random()*55;
+    const dx=Math.cos(angle)*dist,dy=Math.sin(angle)*dist;
+    star.style.cssText='left:'+cx+'px;top:'+cy+'px;--dx:'+dx+'px;--dy:'+dy+'px;font-size:'+(0.7+Math.random()*0.8)+'rem;animation-delay:'+(Math.random()*0.08)+'s';
+    document.body.appendChild(star);setTimeout(function(){star.remove();},950);
+  }
+}
+function xpPop(x,y,txt){
+  const el=document.createElement('div');el.className='xp-pop';el.textContent=txt;
+  el.style.cssText='left:'+x+'px;top:'+y+'px;transform:translateX(-50%)';
+  document.body.appendChild(el);setTimeout(function(){el.remove();},1000);
+}
+
+/* ══ TOAST ══ */
+let toastTimer;
+function showToast(msg){
+  clearTimeout(toastTimer);const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  toastTimer=setTimeout(function(){t.classList.remove('show');},2000);
+}
+
+/* ══ NOTIFICATIONS ══ */
+function scheduleNotifs(){
+  if(!S.notifEnabled||!('Notification'in window)||Notification.permission!=='granted')return;
+  const today=todayStr();
+  S.tasks.filter(function(t){return t.date===today&&!t.done;}).forEach(function(t){
+    const p=t.time.split(':');const now=new Date(),taskTime=new Date();
+    taskTime.setHours(parseInt(p[0]),parseInt(p[1]),0,0);
+    const diff=taskTime-now;
+    if(diff>0&&diff<86400000)setTimeout(function(){
+      const task=S.tasks.find(function(x){return x.id===t.id;});
+      if(task&&!task.done)new Notification('STAGE — Time to Practise 🎭',{body:t.name+' · '+t.dur+' min'});
+    },diff);
+  });
+}
+
+/* ══ UTILS ══ */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ══ BOOT ══ */
+document.addEventListener('DOMContentLoaded',function(){
+  if(S.onboarded){
+    document.getElementById('ob').style.display='none';
+    document.getElementById('app').style.display='flex';
+    initApp();
+  }
+  document.getElementById('e-date').value=todayStr();
+});
+document.addEventListener('dblclick',function(e){e.preventDefault();});
+</script>
+</body>
+</html>
